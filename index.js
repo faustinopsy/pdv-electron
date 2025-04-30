@@ -31,7 +31,7 @@ function createWindow() {
     console.error('Erro ao carregar login.html:', err);
   });
 
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     console.log('Janela principal fechada.');

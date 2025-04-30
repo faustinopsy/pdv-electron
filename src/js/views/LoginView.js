@@ -21,6 +21,7 @@ try {
     }
 
     async logar() {
+    const user = localStorage.getItem('user');
       const username = this.usernameInput.value;
       const password = this.passwordInput.value;
       console.log('Tentativa de login com:', username);
