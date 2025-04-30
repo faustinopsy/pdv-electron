@@ -11,6 +11,8 @@ function createLogin() {
     width: 400,
     height: 400,
     alwaysOnTop:true,
+    frame:false,
+    transparent:true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
