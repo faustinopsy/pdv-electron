@@ -1,5 +1,5 @@
 const path = require('path');
-const Database = require(path.resolve(__dirname, './Database'));
+const Database = require('../db/Database');
 
 class Product {
   static async findAll() {

@@ -22,6 +22,10 @@ try {
 
     async logar() {
     const user = localStorage.getItem('user');
+    if(user){
+        ipcRenderer.send('navigate-to-main');
+        return
+    }
       const username = this.usernameInput.value;
       const password = this.passwordInput.value;
       console.log('Tentativa de login com:', username);
