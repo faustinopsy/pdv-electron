@@ -1,10 +1,13 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
+console.log('Iniciando o Electron...');
 
 let mainWindow;
 
 function createWindow() {
+  console.log('Criando janela principal...');
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -14,17 +17,26 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('src/html/login.html').then(() => {
+  const loginPath = path.resolve(__dirname, 'src/html/login.html');
+  console.log('Verificando login.html:', loginPath);
+  if (fs.existsSync(loginPath)) {
+    console.log('login.html encontrado.');
+  } else {
+    console.error('login.html não encontrado.');
+  }
+
+  mainWindow.loadFile(loginPath).then(() => {
+    console.log('Arquivo login.html carregado.');
   }).catch((err) => {
     console.error('Erro ao carregar login.html:', err);
   });
+
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     console.log('Janela principal fechada.');
     mainWindow = null;
   });
-
-  //mainWindow.webContents.openDevTools();
 }
 
 app.on('ready', () => {
@@ -43,5 +55,22 @@ app.on('activate', () => {
   console.log('Aplicação ativada.');
   if (mainWindow === null) {
     createWindow();
+  }
+});
+
+ipcMain.on('navigate-to-main', (event) => {
+  const mainPath = path.resolve(__dirname, 'src/html/main.html');
+  console.log('Recebido pedido para navegar para:', mainPath);
+  if (fs.existsSync(mainPath)) {
+    console.log('main.html encontrado.');
+    const fileUrl = `file://${mainPath.replace(/\\/g, '/')}`;
+    console.log('Carregando URL:', fileUrl);
+    mainWindow.loadURL(fileUrl).then(() => {
+      console.log('Arquivo main.html carregado via loadURL.');
+    }).catch((err) => {
+      console.error('Erro ao carregar main.html:', err);
+    });
+  } else {
+    console.error('main.html não encontrado em:', mainPath);
   }
 });

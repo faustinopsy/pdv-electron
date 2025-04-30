@@ -1,33 +1,46 @@
 const path = require('path');
-const AuthController = require(path.resolve(__dirname, '../js/controllers/AuthController'));
+const { ipcRenderer } = require('electron');
 
-class LoginView {
-  constructor() {
-    this.usernameInput = document.getElementById('username');
-    this.passwordInput = document.getElementById('password');
-    this.loginButton = document.getElementById('login-btn');
-    this.errorMessage = document.getElementById('error-message');
-    this.iniciarEventos();
-  }
+try {
+  console.log('Tentando carregar AuthController...');
+  const AuthController = require(path.resolve(__dirname, '../js/controllers/AuthController'));
+  console.log('AuthController carregado com sucesso.');
 
-  iniciarEventos() {
-    this.loginButton.addEventListener('click', () => this.logar());
-  }
+  class LoginView {
+    constructor() {
+      this.usernameInput = document.getElementById('username');
+      this.passwordInput = document.getElementById('password');
+      this.loginButton = document.getElementById('login-btn');
+      this.errorMessage = document.getElementById('error-message');
+      console.log('LoginView inicializada');
+      this.iniciarEventos();
+    }
 
-  async logar() {
-    
-    const username = this.usernameInput.value;
-    const password = this.passwordInput.value;
-    try {
-      const user = await AuthController.login(username, password);
-      this.errorMessage.textContent = '';
-      alert(`Bem-vindo, ${user.username}! Role: ${user.role}`);
-    } catch (error) {
-      this.errorMessage.textContent = error.message;
+    iniciarEventos() {
+      this.loginButton.addEventListener('click', () => this.logar());
+    }
+
+    async logar() {
+      const username = this.usernameInput.value;
+      const password = this.passwordInput.value;
+      console.log('Tentativa de login com:', username);
+      try {
+        const user = await AuthController.login(username, password);
+        this.errorMessage.textContent = '';
+        console.log('Login bem-sucedido, solicitando navegação para main.html...');
+        localStorage.setItem('user', JSON.stringify(user));
+        ipcRenderer.send('navigate-to-main');
+      } catch (error) {
+        console.error('Erro no login:', error.message);
+        this.errorMessage.textContent = error.message;
+      }
     }
   }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  new LoginView();
-});
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado, inicializando LoginView');
+    new LoginView();
+  });
+} catch (error) {
+  console.error('Erro ao carregar LoginView:', error.message, error.stack);
+}

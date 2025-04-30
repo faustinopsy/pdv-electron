@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';"> -->
+  <title>PDV - Principal</title>
+  <link rel="stylesheet" href="../css/main.css">
+</head>
+<body>
+  <div class="main-container">
+    <header>
+      <h1>PDV</h1>
+      <div>
+        <span id="user-info"></span>
+        <button id="logout-btn">Sair</button>
+      </div>
+    </header>
+    <div class="content">
+      <div class="products-section">
+        <h2>Produtos</h2>
+        <div class="admin-controls" id="admin-controls" style="display: none;">
+          <input type="text" id="product-name" placeholder="Nome do produto">
+          <input type="number" id="product-price" placeholder="Preço" step="0.01">
+          <input type="number" id="product-stock" placeholder="Estoque">
+          <button id="add-product-btn">Adicionar Produto</button>
+        </div>
+        <input type="text" id="product-search" placeholder="Buscar produto...">
+        <ul id="product-list"></ul>
+      </div>
+      <div class="sale-section">
+        <h2>Venda</h2>
+        <table id="cart">
+          <thead>
+            <tr>
+              <th>Produto</th>
+              <th>Quantidade</th>
+              <th>Preço Unitário</th>
+              <th>Total</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="cart-items"></tbody>
+        </table>
+        <p>Total: R$ <span id="cart-total">0.00</span></p>
+        <button id="finalize-sale-btn">Finalizar Venda</button>
+      </div>
+    </div>
+  </div>
+  <script src="../js/views/MainView.js"></script>
+</body>
+</html>
