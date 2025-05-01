@@ -32,7 +32,7 @@ function createWindow() {
     console.error('Erro ao carregar login.html:', err);
   });
 
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 
   mainWindow.on('closed', () => {
     console.log('Janela principal fechada.');
@@ -73,5 +73,39 @@ ipcMain.on('navigate-to-main', (event) => {
     });
   } else {
     console.error('main.html não encontrado em:', mainPath);
+  }
+});
+
+ipcMain.on('navigate-to-login', (event) => {
+  const mainPath = path.resolve(__dirname, 'src/html/login.html');
+  console.log('Recebido pedido para navegar para:', mainPath);
+  if (fs.existsSync(mainPath)) {
+    console.log('login.html encontrado.');
+    const fileUrl = `file://${mainPath.replace(/\\/g, '/')}`;
+    console.log('Carregando URL:', fileUrl);
+    mainWindow.loadURL(fileUrl).then(() => {
+      console.log('Arquivo main.html carregado via loadURL.');
+    }).catch((err) => {
+      console.error('Erro ao carregar main.html:', err);
+    });
+  } else {
+    console.error('login.html não encontrado em:', mainPath);
+  }
+});
+
+ipcMain.on('navigate-to-register', (event) => {
+  const mainPath = path.resolve(__dirname, 'src/html/register.html');
+  console.log('Recebido pedido para navegar para:', mainPath);
+  if (fs.existsSync(mainPath)) {
+    console.log('register.html encontrado.');
+    const fileUrl = `file://${mainPath.replace(/\\/g, '/')}`;
+    console.log('Carregando URL:', fileUrl);
+    mainWindow.loadURL(fileUrl).then(() => {
+      console.log('Arquivo register.html carregado via loadURL.');
+    }).catch((err) => {
+      console.error('Erro ao carregar register.html:', err);
+    });
+  } else {
+    console.error('register.html não encontrado em:', mainPath);
   }
 });

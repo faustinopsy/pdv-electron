@@ -11,6 +11,7 @@ try {
       this.usernameInput = document.getElementById('username');
       this.passwordInput = document.getElementById('password');
       this.loginButton = document.getElementById('login-btn');
+      this.registerButton = document.getElementById('register-btn');
       this.errorMessage = document.getElementById('error-message');
       console.log('LoginView inicializada');
       this.iniciarEventos();
@@ -18,8 +19,16 @@ try {
 
     iniciarEventos() {
       this.loginButton.addEventListener('click', () => this.logar());
+      this.registerButton.addEventListener('click', () => this.cadastrar());
     }
 
+    async cadastrar() {
+      try {
+        ipcRenderer.send('navigate-to-register');
+      } catch (error) {
+        this.errorMessage.textContent = error.message;
+      }
+    }
     async logar() {
     const user = localStorage.getItem('user');
     if(user){

@@ -10,7 +10,7 @@ class Sale {
   }
 
   static async create(userId, items) {
-    const db = require(path.resolve(__dirname, '../db/Database'));
+    const db = require('../db/Database');
     const total = items.reduce((sum, item) => sum + item.quantity * item.price, 0);
     const date = new Date().toISOString();
     const result = await db.run(
@@ -24,7 +24,6 @@ class Sale {
         'INSERT INTO sale_items (sale_id, product_id, quantity, price) VALUES (?, ?, ?, ?)',
         [saleId, item.productId, item.quantity, item.price]
       );
-      // Atualizar estoque
       await db.run(
         'UPDATE products SET stock = stock - ? WHERE id = ?',
         [item.quantity, item.productId]

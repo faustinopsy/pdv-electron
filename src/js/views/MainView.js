@@ -2,8 +2,8 @@ const path = require('path');
 
 try {
   console.log('Tentando carregar controladores...');
-  const ProductController = require(path.resolve(__dirname, '../controllers/ProductController'));
-  const SaleController = require(path.resolve(__dirname, '../controllers/SaleController'));
+  const ProductController = require(path.resolve(__dirname, '../js/controllers/ProductController'));
+  const SaleController = require(path.resolve(__dirname, '../js/controllers/SaleController'));
   console.log('Controladores carregados com sucesso.');
 
   class MainView {
@@ -42,7 +42,7 @@ try {
       this.init();
     }
 
-    init() {
+    async init() {
       console.log('Executando init...');
       try {
         this.userInfo.textContent = `Usuário: ${this.user.username} (${this.user.role})`;
@@ -56,7 +56,7 @@ try {
       }
 
       this.bindEvents();
-      this.loadProducts();
+      await this.renderProducts();
     }
 
     bindEvents() {
@@ -81,16 +81,23 @@ try {
       try {
         this.products = await ProductController.getAllProducts();
         console.log('Produtos carregados:', this.products);
-        this.renderProducts();
+        if (!this.products || this.products.length === 0) {
+          console.warn('Nenhum produto encontrado no banco de dados.');
+        }
       } catch (error) {
         console.error('Erro ao carregar produtos:', error.message);
       }
     }
 
-    renderProducts() {
+    async renderProducts() {
       console.log('Renderizando produtos...');
+      await this.loadProducts();
       try {
         this.productList.innerHTML = '';
+        if (!this.products || this.products.length === 0) {
+          this.productList.innerHTML = '<li>Nenhum produto disponível.</li>';
+          return;
+        }
         this.products.forEach(product => {
           const li = document.createElement('li');
           li.innerHTML = `${product.name} - R$${product.price.toFixed(2)} (Estoque: ${product.stock})`;
@@ -102,7 +109,7 @@ try {
             deleteBtn.className = 'delete-product-btn';
             deleteBtn.dataset.id = product.id;
             deleteBtn.addEventListener('click', (e) => {
-              e.stopPropagation(); // Evita disparar o clique no li
+              e.stopPropagation();
               this.handleDeleteProduct(product.id);
             });
             li.appendChild(deleteBtn);
@@ -121,6 +128,10 @@ try {
         const search = this.productSearch.value.toLowerCase();
         const filtered = this.products.filter(product => product.name.toLowerCase().includes(search));
         this.productList.innerHTML = '';
+        if (filtered.length === 0) {
+          this.productList.innerHTML = '<li>Nenhum produto encontrado.</li>';
+          return;
+        }
         filtered.forEach(product => {
           const li = document.createElement('li');
           li.innerHTML = `${product.name} - R$${product.price.toFixed(2)} (Estoque: ${product.stock})`;
@@ -156,7 +167,7 @@ try {
           this.productNameInput.value = '';
           this.productPriceInput.value = '';
           this.productStockInput.value = '';
-          await this.loadProducts();
+          await this.renderProducts();
         } else {
           alert('Preencha todos os campos corretamente.');
         }
@@ -171,8 +182,8 @@ try {
       try {
         if (confirm('Tem certeza que deseja deletar este produto?')) {
           await ProductController.deleteProduct(productId);
-          this.cart = this.cart.filter(item => item.productId !== productId); // Remove do carrinho
-          await this.loadProducts();
+          this.cart = this.cart.filter(item => item.productId !== productId);
+          await this.renderProducts();
           this.renderCart();
           alert('Produto deletado com sucesso.');
         }
@@ -248,6 +259,7 @@ try {
           alert('Adicione produtos à venda.');
           return;
         }
+
         for (const item of this.cart) {
           const product = this.products.find(p => p.id === item.productId);
           if (!product || product.stock < item.quantity) {
@@ -255,7 +267,9 @@ try {
             return;
           }
         }
+
         await SaleController.createSale(this.user.id, this.cart);
+       
         for (const item of this.cart) {
           const product = this.products.find(p => p.id === item.productId);
           await ProductController.updateProduct(
@@ -265,10 +279,15 @@ try {
             product.stock - item.quantity
           );
         }
-        alert('Venda finalizada com sucesso!');
+
+        console.log('MainView.handleFinalizeSale: Limpando carrinho...');
         this.cart = [];
+        console.log('MainView.handleFinalizeSale: Renderizando carrinho...');
         this.renderCart();
-        await this.loadProducts();
+        console.log('MainView.handleFinalizeSale: Atualizando lista de produtos...');
+        await this.renderProducts();
+        console.log('MainView.handleFinalizeSale: Exibindo alerta de sucesso');
+        alert('Venda finalizada com sucesso!');
       } catch (error) {
         console.error('Erro ao finalizar venda:', error.message);
         alert('Erro ao finalizar venda.');

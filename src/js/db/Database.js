@@ -3,6 +3,8 @@ const path = require('path');
 
 class Database {
   constructor() {
+    this.ready = false;
+    this.db = null;
     const dbPath = path.join(process.cwd(), 'pdv.db');
     console.log('Caminho do banco de dados:', dbPath);
     this.db = new sqlite3.Database(dbPath, (err) => {
@@ -10,9 +12,14 @@ class Database {
         console.error('Erro ao conectar ao banco:', err.message);
       } else {
         console.log('Conectado ao banco SQLite.');
+        this.ready = true;
         this.init();
       }
     });
+  }
+
+  isReady() {
+    return this.ready;
   }
 
   init() {
@@ -48,7 +55,7 @@ class Database {
       this.db.run(`
         CREATE TABLE IF NOT EXISTS products (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          name TEXT NOT NULL,
+          name TEXT NOT NULL UNIQUE,
           price REAL NOT NULL,
           stock INTEGER NOT NULL
         )
@@ -143,8 +150,9 @@ class Database {
           console.error('Erro ao obter dados:', query, err.message);
           reject(err);
         } else {
-          console.log('Dados obtidos:', rows);
           resolve(rows);
+          console.log('Dados obtidos:', rows);
+          
         }
       });
     });
