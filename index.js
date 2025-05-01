@@ -11,12 +11,17 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    frame:false,
+    fullscreen:true,
+    transparent:true,
+    resizable: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
+
+  //mainWindow.webContents.openDevTools();
+
 
   const loginPath = path.resolve(__dirname, 'src/html/login.html');
   console.log('Verificando login.html:', loginPath);
@@ -32,7 +37,7 @@ function createWindow() {
     console.error('Erro ao carregar login.html:', err);
   });
 
-  mainWindow.webContents.openDevTools();
+
 
   mainWindow.on('closed', () => {
     console.log('Janela principal fechada.');
