@@ -9,8 +9,9 @@ let mainWindow;
 function createWindow() {
   console.log('Criando janela principal...');
   mainWindow = new BrowserWindow({
+    minWidth: 1280,
+    minHeight: 720,
     width: 800,
-    height: 600,
     fullscreen:true,
     transparent:true,
     resizable: false,
@@ -39,10 +40,9 @@ function createWindow() {
 
 
 
-  mainWindow.on('closed', () => {
-    console.log('Janela principal fechada.');
-    mainWindow = null;
-  });
+ipcMain.on('close-window', () => {
+  if (mainWindow) mainWindow.close();
+});
 }
 
 app.on('ready', () => {
@@ -62,6 +62,10 @@ app.on('activate', () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.on('close-window', () => {
+  if (mainWindow) mainWindow.close();
 });
 
 ipcMain.on('navigate-to-main', (event) => {

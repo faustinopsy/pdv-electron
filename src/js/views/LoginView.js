@@ -11,6 +11,7 @@ try {
       this.usernameInput = document.getElementById('username');
       this.passwordInput = document.getElementById('password');
       this.loginButton = document.getElementById('login-btn');
+      this.windowClose = document.getElementById('close-btn');
       this.registerButton = document.getElementById('register-btn');
       this.errorMessage = document.getElementById('error-message');
       console.log('LoginView inicializada');
@@ -20,6 +21,8 @@ try {
     iniciarEventos() {
       this.loginButton.addEventListener('click', () => this.logar());
       this.registerButton.addEventListener('click', () => this.cadastrar());
+      this.windowClose.addEventListener('click', () => ipcRenderer.send('close-window'));
+
     }
 
     async cadastrar() {
