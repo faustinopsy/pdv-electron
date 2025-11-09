@@ -1,3 +1,4 @@
+const { ipcRenderer } = require('electron');
 const path = require('path');
 const AuthController = require(path.resolve(__dirname, '../js/controllers/AuthController'));
 
@@ -6,12 +7,14 @@ class LoginView {
     this.usernameInput = document.getElementById('username');
     this.passwordInput = document.getElementById('password');
     this.loginButton = document.getElementById('login-btn');
+    this.windowClose = document.getElementById('close-btn');
     this.errorMessage = document.getElementById('error-message');
     this.iniciarEventos();
   }
 
   iniciarEventos() {
     this.loginButton.addEventListener('click', () => this.logar());
+     this.windowClose.addEventListener('click', () => ipcRenderer.send('close-window'));
   }
 
   async logar() {

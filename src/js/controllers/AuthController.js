@@ -9,6 +9,7 @@ class AuthController {
     }
     throw new Error('Credenciais inválidas');
   }
+ 
 }
 
 module.exports = new AuthController();

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 
@@ -8,12 +8,22 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    transparent: true,
+    titleBarStyle: 'hidden',
+    alwaysOnTop: true,
+    resizable: false,
+    frame: false,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false
     }
   });
 
+  function closeWindow(){
+    if (mainWindow) {
+      mainWindow.close();
+    }
+  }
   mainWindow.loadFile('src/html/login.html').then(() => {
   }).catch((err) => {
     console.error('Erro ao carregar login.html:', err);
@@ -26,6 +36,10 @@ function createWindow() {
 
   //mainWindow.webContents.openDevTools();
 }
+
+ipcMain.on('close-window', () => {
+  if (mainWindow) mainWindow.close();
+});
 
 app.on('ready', () => {
   console.log('Electron pronto, inicializando janela...');
